@@ -1,6 +1,7 @@
 import 'dart:ui';
 
-import 'package:chat_app/screens/login/controller/login_controller.dart';
+import 'package:chat_app/controller/login_controller.dart';
+import 'package:chat_app/utils/extensions/sizedbox_extension.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -39,13 +40,13 @@ class LoginPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 30), // For the logo/icon
+                  30.ph, // For the logo/icon
                   const Icon(
                     Icons.chat_bubble_outline,
                     size: 80,
                     color: Colors.greenAccent,
                   ),
-                  const SizedBox(height: 20),
+                  20.ph,
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -60,7 +61,7 @@ class LoginPage extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const SizedBox(width: 8),
+                              8.pw,
                               TextButton(
                                 onPressed: () {},
                                 child: const Text(
@@ -70,7 +71,7 @@ class LoginPage extends StatelessWidget {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 16),
+                          16.ph,
                           TextFormField(
                             controller: emailController,
                             style: const TextStyle(color: Colors.white),
@@ -93,7 +94,7 @@ class LoginPage extends StatelessWidget {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 12),
+                          12.ph,
                           //Password
                           TextFormField(
                             controller: passwordController,
@@ -120,7 +121,7 @@ class LoginPage extends StatelessWidget {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 20),
+                          20.ph,
                           ElevatedButton(
                             onPressed: () {
                               if (formKey.currentState!.validate()) {
@@ -145,7 +146,7 @@ class LoginPage extends StatelessWidget {
                               style: TextStyle(color: Colors.black),
                             ),
                           ),
-                          const SizedBox(height: 12),
+                          12.ph,
                           Center(
                             child: Text.rich(
                               TextSpan(
@@ -170,29 +171,31 @@ class LoginPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  20.ph,
                   const Text(
                     '- Social account login -',
                     style: TextStyle(color: Colors.white70),
                   ),
-                  const SizedBox(height: 8),
+                  8.ph,
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      IconButton(
-                        icon: const Icon(Icons.person, color: Colors.white),
-                        onPressed: () {
-                          loginController.loginAnonymous();
+                      CustomButtons(
+                          icon: Icons.person,
+                          onPress: () {
+                            loginController.loginAnonymous();
+                          }),
+                      10.pw,
+                      CustomButtons(
+                        icon: Icons.facebook,
+                        onPress: () {},
+                      ),
+                      10.pw,
+                      CustomButtons(
+                        icon: Icons.g_mobiledata,
+                        onPress: () {
+                          loginController.loginWithGoogle();
                         },
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.apple, color: Colors.white),
-                        onPressed: () {},
-                      ),
-                      IconButton(
-                        icon:
-                            const Icon(Icons.g_mobiledata, color: Colors.white),
-                        onPressed: () {},
                       ),
                     ],
                   ),
@@ -201,6 +204,37 @@ class LoginPage extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class CustomButtons extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onPress;
+
+  const CustomButtons({
+    super.key,
+    required this.icon,
+    required this.onPress,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle, // Makes it circular
+        border: Border.all(
+          color: Colors.grey, // Border color
+          width: 1, // Border thickness
+        ),
+      ),
+      child: IconButton(
+        iconSize: 35,
+        icon: Icon(icon),
+        color: Colors.greenAccent, // Icon color
+        onPressed: onPress,
+        splashRadius: 28, // Customize splash radius
       ),
     );
   }

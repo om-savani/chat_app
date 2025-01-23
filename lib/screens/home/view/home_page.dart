@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../../routes/app_routes.dart';
 
@@ -20,11 +21,13 @@ class _HomePageState extends State<HomePage> {
         title: const Text('Home'),
         actions: [
           IconButton(
-              onPressed: () async {
-                await FirebaseAuth.instance.signOut();
-                Get.offNamed(AppRoutes.login);
-              },
-              icon: const Icon(Icons.logout))
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
+              await GoogleSignIn().signOut();
+              Get.offNamed(AppRoutes.login);
+            },
+            icon: const Icon(Icons.logout),
+          ),
         ],
       ),
     );

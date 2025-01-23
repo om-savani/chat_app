@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:chat_app/screens/register/controller/register_controller.dart';
+import 'package:chat_app/controller/register_controller.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -166,9 +166,15 @@ class RegisterPage extends StatelessWidget {
                                     passwordController.text.trim();
                                 String confirmPassword =
                                     confirmPasswordController.text.trim();
+
                                 if (password == confirmPassword) {
-                                  registerController.register(
-                                      email: email, password: password);
+                                  try {
+                                    registerController.register(
+                                        email: email, password: password);
+                                  } catch (e) {
+                                    Get.snackbar(
+                                        'Error', 'An unexpected error: $e');
+                                  }
                                 } else {
                                   passwordController.clear();
                                   confirmPasswordController.clear();

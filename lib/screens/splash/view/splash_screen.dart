@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -32,8 +30,8 @@ class _SplashScreenState extends State<SplashScreen> {
         fit: StackFit.expand,
         children: [
           Image.asset(
-            'assets/images/background/splash_background.png',
-            fit: BoxFit.cover,
+            'assets/images/background/splash_bg.jpg',
+            fit: BoxFit.fill,
           ),
           // const Center(
           //   child: Text(
