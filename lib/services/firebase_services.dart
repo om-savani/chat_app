@@ -7,57 +7,53 @@ class FirebaseServices {
   FirebaseServices._();
   static FirebaseServices firebaseServices = FirebaseServices._();
   FirebaseAuth auth = FirebaseAuth.instance;
+  GoogleSignIn googleSignIn = GoogleSignIn();
 
   // Register with email and password
-  Future<User?> register(String email, String password) async {
-    User? user;
+  Future<String> register(String email, String password) async {
+    String msg;
     try {
-      UserCredential credential = await auth.createUserWithEmailAndPassword(
+      await auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
-      user = credential.user;
+
+      msg = "Success";
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'email-already-in-use') {
-        Logger().e('Error: Email is already in use');
-        Get.snackbar('Error', 'The email address is already in use.');
-      } else if (e.code == 'invalid-email') {
-        Logger().e('Error: Invalid email format');
-        Get.snackbar('Error', 'The email address is not valid.');
-      } else if (e.code == 'weak-password') {
-        Logger().e('Error: Weak password');
-        Get.snackbar('Error', 'The password is too weak.');
-      } else {
-        Logger().e('FirebaseAuthException: $e');
-        Get.snackbar('Error', 'Failed to register. Please try again.');
+      switch (e.code) {
+        case 'operation-not-allowed':
+          msg = 'this service not available';
+        case 'week-password':
+          msg = "Your password is too week";
+        default:
+          msg = e.code;
       }
-    } catch (e) {
-      Logger().e('Unexpected error: $e');
-      Get.snackbar('Error', 'An unexpected error occurred: $e');
     }
-    return user;
+    return msg;
   }
 
   // Login with email and password
-  Future<User?> login(String email, String password) async {
+  Future<String?> login(String email, String password) async {
+    String msg;
     try {
       UserCredential credential = await auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-      return credential.user;
+      msg = "Success";
+      return msg;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
-        Logger().e('Error: User not found');
-        Get.snackbar('Error', 'No user found with this email.');
+        msg = 'No user found with this email.';
+        Get.snackbar('Error', msg);
       } else if (e.code == 'wrong-password') {
-        Logger().e('Error: Wrong password');
-        Get.snackbar('Error', 'Incorrect password. Please try again.');
+        msg = 'Wrong password provided for this user.';
+        Get.snackbar('Error', msg);
       } else if (e.code == 'invalid-email') {
-        Logger().e('Error: Invalid email');
-        Get.snackbar('Error', 'Invalid email format.');
+        msg = 'Invalid email format.';
+        Get.snackbar('Error', msg);
       } else {
-        Logger().e('FirebaseAuthException: $e');
+        msg = e.toString();
         Get.snackbar('Error', 'Login failed. Please try again.');
       }
       return null;
@@ -69,7 +65,8 @@ class FirebaseServices {
   }
 
 // Add User With Google
-  Future<User?> loginWithGoogle() async {
+  Future<String?> loginWithGoogle() async {
+    String msg;
     try {
       GoogleSignInAccount? user = await GoogleSignIn().signIn();
       if (user == null) {
@@ -84,7 +81,8 @@ class FirebaseServices {
       );
       UserCredential credentialUser =
           await auth.signInWithCredential(credential);
-      return credentialUser.user;
+      msg = "Success";
+      return msg;
     } catch (e) {
       Logger().e('Google login error: $e');
       Get.snackbar('Error', 'Google login failed: $e');
@@ -102,5 +100,12 @@ class FirebaseServices {
       Get.snackbar('Error', 'Anonymous login failed: $e');
       return null;
     }
+  }
+
+  User? get currentUser => auth.currentUser;
+
+  void logout() async {
+    await auth.signOut();
+    googleSignIn.signOut();
   }
 }

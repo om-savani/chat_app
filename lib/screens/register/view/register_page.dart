@@ -1,20 +1,31 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:chat_app/controller/register_controller.dart';
+import 'package:chat_app/services/api_service.dart';
+import 'package:chat_app/utils/extensions/sizedbox_extension.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 
-class RegisterPage extends StatelessWidget {
+class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
 
   @override
+  _RegisterPageState createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  TextEditingController nameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController confirmPasswordController = TextEditingController();
+  RegisterController registerController = Get.put(RegisterController());
+
+  @override
   Widget build(BuildContext context) {
-    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-    TextEditingController emailController = TextEditingController();
-    TextEditingController passwordController = TextEditingController();
-    TextEditingController confirmPasswordController = TextEditingController();
-    RegisterController registerController = Get.put(RegisterController());
     return Scaffold(
       body: Stack(
         children: [
@@ -40,12 +51,21 @@ class RegisterPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const Icon(
-                      Icons.person_add_alt_1,
-                      size: 80,
-                      color: Colors.greenAccent,
+                    GestureDetector(
+                      onTap: registerController.pickImage,
+                      child: CircleAvatar(
+                        radius: 40,
+                        backgroundColor: Colors.greenAccent,
+                        backgroundImage: registerController.imageFile != null
+                            ? FileImage(registerController.imageFile!)
+                            : null,
+                        child: registerController.imageFile == null
+                            ? const Icon(Icons.camera_alt,
+                                color: Colors.black, size: 30)
+                            : null,
+                      ),
                     ),
-                    const SizedBox(height: 20),
+                    20.sh,
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
@@ -64,9 +84,30 @@ class RegisterPage extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 16),
-
-                          // Email
+                          16.sh,
+                          TextFormField(
+                            controller: nameController,
+                            style: const TextStyle(color: Colors.white),
+                            decoration: InputDecoration(
+                              prefixIcon: const Icon(Icons.person,
+                                  color: Colors.white70),
+                              hintText: 'Username',
+                              hintStyle: const TextStyle(color: Colors.white70),
+                              filled: true,
+                              fillColor: Colors.black.withOpacity(0.5),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter Username';
+                              }
+                              return null;
+                            },
+                          ),
+                          12.sh,
                           TextFormField(
                             controller: emailController,
                             style: const TextStyle(color: Colors.white),
@@ -93,18 +134,26 @@ class RegisterPage extends StatelessWidget {
                               return null;
                             },
                           ),
-                          const SizedBox(height: 12),
-
-                          // Password
+                          12.sh,
                           TextFormField(
                             controller: passwordController,
                             style: const TextStyle(color: Colors.white),
-                            obscureText: true,
+                            obscureText:
+                                registerController.isShowPassword.value,
                             decoration: InputDecoration(
                               prefixIcon:
                                   const Icon(Icons.lock, color: Colors.white70),
-                              suffixIcon: const Icon(Icons.remove_red_eye,
-                                  color: Colors.white70),
+                              suffixIcon: IconButton(
+                                onPressed: () {
+                                  registerController.changeShowPassword();
+                                },
+                                icon: Icon(
+                                  registerController.isShowPassword.value
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
+                                  color: Colors.white70,
+                                ),
+                              ),
                               hintText: 'Password',
                               hintStyle: const TextStyle(color: Colors.white70),
                               filled: true,
@@ -124,66 +173,71 @@ class RegisterPage extends StatelessWidget {
                               return null;
                             },
                           ),
-                          const SizedBox(height: 12),
-
-                          // Confirm Password
-                          TextFormField(
-                            controller: confirmPasswordController,
-                            style: const TextStyle(color: Colors.white),
-                            obscureText: true,
-                            decoration: InputDecoration(
-                              prefixIcon: const Icon(Icons.lock_outline,
-                                  color: Colors.white70),
-                              suffixIcon: const Icon(Icons.remove_red_eye,
-                                  color: Colors.white70),
-                              hintText: 'Confirm Password',
-                              hintStyle: const TextStyle(color: Colors.white70),
-                              filled: true,
-                              fillColor: Colors.black.withOpacity(0.5),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide.none,
+                          12.sh,
+                          Obx(() {
+                            return TextFormField(
+                              controller: confirmPasswordController,
+                              style: const TextStyle(color: Colors.white),
+                              obscureText:
+                                  registerController.isShowCPassword.value,
+                              decoration: InputDecoration(
+                                prefixIcon: const Icon(Icons.lock_outline,
+                                    color: Colors.white70),
+                                suffixIcon: IconButton(
+                                  onPressed: () {
+                                    registerController.changeShowCPassword();
+                                  },
+                                  icon: Icon(
+                                    registerController.isShowCPassword.value
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                    color: Colors.white70,
+                                  ),
+                                ),
+                                hintText: 'Confirm Password',
+                                hintStyle:
+                                    const TextStyle(color: Colors.white70),
+                                filled: true,
+                                fillColor: Colors.black.withOpacity(0.5),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide.none,
+                                ),
                               ),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please confirm your password';
-                              }
-                              if (value != passwordController.text) {
-                                return 'Passwords do not match';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 20),
-
-                          // Register Button
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please confirm your password';
+                                }
+                                if (value != passwordController.text) {
+                                  return 'Passwords do not match';
+                                }
+                                return null;
+                              },
+                            );
+                          }),
+                          20.sh,
                           ElevatedButton(
-                            onPressed: () {
-                              if (formKey.currentState!.validate()) {
-                                String email = emailController.text.trim();
-                                String password =
-                                    passwordController.text.trim();
-                                String confirmPassword =
-                                    confirmPasswordController.text.trim();
+                            onPressed: () async {
+                              if (formKey.currentState!.validate() &&
+                                  registerController.imageFile != null) {
+                                if (passwordController.text ==
+                                    confirmPasswordController.text) {
+                                  String img = await ApiService.instance
+                                      .sendUserImage(
+                                          image: registerController.imageFile!);
 
-                                if (password == confirmPassword) {
-                                  try {
-                                    registerController.register(
-                                        email: email, password: password);
-                                  } catch (e) {
-                                    Get.snackbar(
-                                        'Error', 'An unexpected error: $e');
-                                  }
+                                  registerController.register(
+                                    email: emailController.text,
+                                    password: passwordController.text,
+                                    name: nameController.text,
+                                    image: img,
+                                  );
                                 } else {
                                   passwordController.clear();
                                   confirmPasswordController.clear();
-                                  Get.snackbar(
-                                      'Error', 'Passwords do not match');
+                                  Get.snackbar('Failed',
+                                      'Password and confirm password should be match');
                                 }
-                              } else {
-                                Get.snackbar(
-                                    'Error', 'Please fill all the fields');
                               }
                             },
                             style: ElevatedButton.styleFrom(
@@ -197,7 +251,7 @@ class RegisterPage extends StatelessWidget {
                               style: TextStyle(color: Colors.black),
                             ),
                           ),
-                          const SizedBox(height: 12),
+                          12.sh,
                           Center(
                             child: Text.rich(
                               TextSpan(

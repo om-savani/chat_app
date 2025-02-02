@@ -40,13 +40,13 @@ class LoginPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  30.ph, // For the logo/icon
+                  30.sh, // For the logo/icon
                   const Icon(
                     Icons.chat_bubble_outline,
                     size: 80,
                     color: Colors.greenAccent,
                   ),
-                  20.ph,
+                  20.sh,
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -61,7 +61,7 @@ class LoginPage extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              8.pw,
+                              8.sw,
                               TextButton(
                                 onPressed: () {},
                                 child: const Text(
@@ -71,7 +71,7 @@ class LoginPage extends StatelessWidget {
                               ),
                             ],
                           ),
-                          16.ph,
+                          16.sh,
                           TextFormField(
                             controller: emailController,
                             style: const TextStyle(color: Colors.white),
@@ -94,34 +94,46 @@ class LoginPage extends StatelessWidget {
                               ),
                             ),
                           ),
-                          12.ph,
+                          12.sh,
                           //Password
-                          TextFormField(
-                            controller: passwordController,
-                            style: const TextStyle(color: Colors.white),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your password';
-                              }
-                              return null;
-                            },
-                            obscureText: true,
-                            decoration: InputDecoration(
-                              prefixIcon:
-                                  const Icon(Icons.lock, color: Colors.white70),
-                              suffixIcon: const Icon(Icons.remove_red_eye,
-                                  color: Colors.white70),
-                              hintText: 'Password',
-                              hintStyle: const TextStyle(color: Colors.white70),
-                              filled: true,
-                              fillColor: Colors.black.withOpacity(0.5),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide.none,
+                          Obx(() {
+                            return TextFormField(
+                              controller: passwordController,
+                              style: const TextStyle(color: Colors.white),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter your password';
+                                }
+                                return null;
+                              },
+                              obscureText: loginController.isShowPassword.value,
+                              decoration: InputDecoration(
+                                prefixIcon: const Icon(Icons.lock,
+                                    color: Colors.white70),
+                                suffixIcon: IconButton(
+                                  onPressed: () {
+                                    loginController.changeShowPassword();
+                                  },
+                                  icon: Icon(
+                                    loginController.isShowPassword.value
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                    color: Colors.white70,
+                                  ),
+                                ),
+                                hintText: 'Password',
+                                hintStyle:
+                                    const TextStyle(color: Colors.white70),
+                                filled: true,
+                                fillColor: Colors.black.withOpacity(0.5),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide.none,
+                                ),
                               ),
-                            ),
-                          ),
-                          20.ph,
+                            );
+                          }),
+                          20.sh,
                           ElevatedButton(
                             onPressed: () {
                               if (formKey.currentState!.validate()) {
@@ -146,7 +158,7 @@ class LoginPage extends StatelessWidget {
                               style: TextStyle(color: Colors.black),
                             ),
                           ),
-                          12.ph,
+                          12.sh,
                           Center(
                             child: Text.rich(
                               TextSpan(
@@ -171,12 +183,12 @@ class LoginPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  20.ph,
+                  20.sh,
                   const Text(
                     '- Social account login -',
                     style: TextStyle(color: Colors.white70),
                   ),
-                  8.ph,
+                  8.sh,
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -185,12 +197,12 @@ class LoginPage extends StatelessWidget {
                           onPress: () {
                             loginController.loginAnonymous();
                           }),
-                      10.pw,
+                      10.sw,
                       CustomButtons(
                         icon: Icons.facebook,
                         onPress: () {},
                       ),
-                      10.pw,
+                      10.sw,
                       CustomButtons(
                         icon: Icons.g_mobiledata,
                         onPress: () {
@@ -223,18 +235,18 @@ class CustomButtons extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        shape: BoxShape.circle, // Makes it circular
+        shape: BoxShape.circle,
         border: Border.all(
-          color: Colors.grey, // Border color
-          width: 1, // Border thickness
+          color: Colors.grey,
+          width: 1,
         ),
       ),
       child: IconButton(
         iconSize: 35,
         icon: Icon(icon),
-        color: Colors.greenAccent, // Icon color
+        color: Colors.greenAccent,
         onPressed: onPress,
-        splashRadius: 28, // Customize splash radius
+        splashRadius: 28,
       ),
     );
   }
