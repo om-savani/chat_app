@@ -40,7 +40,7 @@ class LoginPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  30.sh, // For the logo/icon
+                  30.sh,
                   const Icon(
                     Icons.chat_bubble_outline,
                     size: 80,

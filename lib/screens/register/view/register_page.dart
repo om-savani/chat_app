@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:ui';
 
 import 'package:chat_app/controller/register_controller.dart';
@@ -7,7 +6,6 @@ import 'package:chat_app/utils/extensions/sizedbox_extension.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});

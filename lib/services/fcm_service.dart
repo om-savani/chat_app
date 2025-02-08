@@ -24,9 +24,9 @@ class FCMService {
       var accessToken =
           await clientViaServiceAccount(accountCredential, scopes);
       return accessToken.credentials.accessToken.data;
-    } catch (e, stacktrace) {
-      log("⚠️ Error in getAccessToken: $e");
-      log("🔍 StackTrace: $stacktrace");
+    } catch (e, exp) {
+      log("Error in getAccessToken: $e");
+      log(" Exception: $exp");
       return null;
     }
   }
@@ -40,7 +40,7 @@ class FCMService {
     try {
       String? accessToken = await getAccessToken();
       if (accessToken == null) {
-        log("❌ Failed to get access token.");
+        log("Failed to get access token.");
         return;
       }
 
@@ -71,14 +71,14 @@ class FCMService {
       );
 
       if (res.statusCode == 200) {
-        log('✅ Notification sent successfully: ${res.body}');
+        log(' Notification sent successfully: ${res.body}');
       } else {
-        log('❌ Failed to send notification. Status Code: ${res.statusCode}');
+        log('Failed to send notification. Status Code: ${res.statusCode}');
         log('Response: ${res.body}');
       }
-    } catch (e, stacktrace) {
-      log("⚠️ Error in sendFCM: $e");
-      log("🔍 StackTrace: $stacktrace");
+    } catch (e, exp) {
+      log("Error in sendFCM: $e");
+      log("Exception: $exp");
     }
   }
 }
