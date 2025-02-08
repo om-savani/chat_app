@@ -50,6 +50,7 @@ class FireStoreService {
     return docId;
   }
 
+  //sent chat
   void sentChat({required ChatModel chatModal}) {
     String docId =
         createDocId(sender: chatModal.sender, receiver: chatModal.receiver);
@@ -61,6 +62,7 @@ class FireStoreService {
         .add(chatModal.toMap);
   }
 
+  //get chats
   Stream<QuerySnapshot<Map<String, dynamic>>> getChats({
     required String sender,
     required String receiver,
@@ -73,5 +75,46 @@ class FireStoreService {
         .collection('Chats')
         .orderBy('time', descending: false)
         .snapshots();
+  }
+
+  //delete chat
+  void deleteChat(
+      {required String sender, required String receiver, required String id}) {
+    String docId = createDocId(sender: sender, receiver: receiver);
+    fireStore
+        .collection(chatRoomCollection)
+        .doc(docId)
+        .collection('Chats')
+        .doc(id)
+        .delete();
+  }
+
+  //edit chat
+  void editChat(
+      {required String sender,
+      required String receiver,
+      required String id,
+      required String message}) {
+    String docId = createDocId(sender: sender, receiver: receiver);
+    fireStore
+        .collection(chatRoomCollection)
+        .doc(docId)
+        .collection('Chats')
+        .doc(id)
+        .update({'message': message});
+  }
+
+  Future<void> updateMessageSeenStatus({
+    required String sender,
+    required String receiver,
+    required String id,
+  }) async {
+    String docId = createDocId(sender: sender, receiver: receiver);
+    await fireStore
+        .collection(chatRoomCollection)
+        .doc(docId)
+        .collection('Chats')
+        .doc(id)
+        .update({'seen': true});
   }
 }

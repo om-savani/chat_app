@@ -1,4 +1,5 @@
 import 'package:chat_app/model/user_model.dart';
+import 'package:chat_app/services/fcm_service.dart';
 import 'package:chat_app/services/firebase_services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
@@ -37,6 +38,7 @@ class LoginController extends GetxController {
             name: userdata.displayName!,
             email: userdata.email!,
             photoUrl: userdata.photoURL!,
+            token: await FcmService.instance.getAccessToken() ?? '',
           ),
         );
       }
@@ -57,6 +59,7 @@ class LoginController extends GetxController {
             email: value.email!,
             photoUrl:
                 "https://avatars.mds.yandex.net/i?id=d36ac640ce13876899fd2633f75ec08f0cb05b5b-9226569-images-thumbs&ref=rim&n=33&w=250&h=250",
+            token: '',
           ),
         );
         Get.snackbar('Success', 'Login Successfully');

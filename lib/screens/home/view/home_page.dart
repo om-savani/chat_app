@@ -1,4 +1,5 @@
 import 'package:chat_app/model/user_model.dart';
+import 'package:chat_app/utils/constants.dart';
 import 'package:chat_app/utils/extensions/sizedbox_extension.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +23,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
-      backgroundColor: Colors.greenAccent,
+      backgroundColor: primaryColor,
       drawer: Drawer(
         child: Column(
           children: [
@@ -38,6 +39,7 @@ class _HomePageState extends State<HomePage> {
                   userName = modal.name;
 
                   return UserAccountsDrawerHeader(
+                    decoration: const BoxDecoration(color: primaryColor),
                     currentAccountPicture: CircleAvatar(
                       foregroundImage: NetworkImage(modal.photoUrl ??
                           'https://avatars.mds.yandex.net/i?id=d36ac640ce13876899fd2633f75ec08f0cb05b5b-9226569-images-thumbs&ref=rim&n=33&w=250&h=250'),
@@ -62,7 +64,7 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       appBar: AppBar(
-        backgroundColor: Colors.greenAccent,
+        backgroundColor: primaryColor,
         foregroundColor: Colors.white,
         automaticallyImplyLeading: false,
         title: Text.rich(TextSpan(
