@@ -117,4 +117,24 @@ class FireStoreService {
         .doc(id)
         .update({'seen': true});
   }
+
+  //get last message
+  Future<Map<String, dynamic>?> getLastMessage({
+    required String sender,
+    required String receiver,
+  }) async {
+    String docId = createDocId(sender: sender, receiver: receiver);
+    QuerySnapshot<Map<String, dynamic>> snapshot = await fireStore
+        .collection(chatRoomCollection)
+        .doc(docId)
+        .collection('Chats')
+        .orderBy('time', descending: true)
+        .limit(1)
+        .get();
+
+    if (snapshot.docs.isNotEmpty) {
+      return snapshot.docs.first.data();
+    }
+    return null;
+  }
 }

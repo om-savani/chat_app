@@ -2,6 +2,7 @@ import 'package:chat_app/model/user_model.dart';
 import 'package:chat_app/services/fcm_service.dart';
 import 'package:chat_app/services/firebase_services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
@@ -38,7 +39,7 @@ class LoginController extends GetxController {
             name: userdata.displayName!,
             email: userdata.email!,
             photoUrl: userdata.photoURL!,
-            token: await FcmService.instance.getAccessToken() ?? '',
+            token: await FirebaseMessaging.instance.getToken() ?? '',
           ),
         );
       }

@@ -292,10 +292,10 @@ class _ChatPageState extends State<ChatPage> {
                         time: Timestamp.now(),
                       ),
                     );
-                    FcmService.instance.sendNotification(
+                    FCMService.instance.sendFCM(
                       title: currentUser,
                       body: messageController.text.trim(),
-                      accessToken: user.token,
+                      token: user.token,
                     );
                     messageController.clear();
                   }

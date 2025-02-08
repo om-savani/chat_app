@@ -4,6 +4,7 @@ import 'package:chat_app/utils/extensions/sizedbox_extension.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 import '../../../routes/app_routes.dart';
 import '../../../services/firebase_services.dart';
@@ -19,6 +20,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   String userName = '';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,7 +50,6 @@ class _HomePageState extends State<HomePage> {
                     accountEmail: Text(modal.email ?? 'Unknown'),
                   );
                 }
-
                 return Container();
               },
             ),
@@ -71,8 +72,7 @@ class _HomePageState extends State<HomePage> {
           text: 'Hello, ',
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 12,
-            // fontWeight: FontWeight.bold,
+            fontSize: 10,
           ),
           children: [
             TextSpan(
@@ -96,13 +96,6 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Column(
         children: [
-          // Row(
-          //   children: [
-          //
-          //     const Spacer(),
-          //
-          //   ],
-          // ),
           20.sh,
           Expanded(
             child: Container(
@@ -123,29 +116,49 @@ class _HomePageState extends State<HomePage> {
                     );
                   } else if (snapshot.hasData) {
                     var data = snapshot.data;
-
                     List<QueryDocumentSnapshot<Map<String, dynamic>>>? allDocs =
                         data?.docs ?? [];
                     List<UserModel> userData = allDocs
-                        .map(
-                          (e) => UserModel.fromMap(e.data()),
-                        )
+                        .map((e) => UserModel.fromMap(e.data()))
                         .toList();
 
                     return ListView.builder(
                       itemCount: userData.length,
                       itemBuilder: (context, index) {
-                        var usersInfo = userData[index];
-
-                        return ListTile(
-                          onTap: () {
-                            Get.toNamed(AppRoutes.chat, arguments: usersInfo);
+                        UserModel usersInfo = userData[index];
+                        return FutureBuilder(
+                          future: FireStoreService.instance.getLastMessage(
+                              sender: FirebaseServices
+                                  .firebaseServices.auth.currentUser!.email!,
+                              receiver: usersInfo.email),
+                          builder: (context, snapshot) {
+                            String lastMessage = 'No messages yet';
+                            String time = '';
+                            if (snapshot.hasData && snapshot.data != null) {
+                              lastMessage =
+                                  snapshot.data!['message'] ?? 'No messages';
+                              if (lastMessage.length > 15) {
+                                lastMessage =
+                                    "${lastMessage.substring(0, 30)}...";
+                              }
+                              Timestamp timestamp = snapshot.data!['time'];
+                              DateTime dateTime = timestamp.toDate();
+                              time = DateFormat('hh:mm a').format(dateTime);
+                            }
+                            return ListTile(
+                              onTap: () {
+                                Get.toNamed(AppRoutes.chat,
+                                    arguments: usersInfo);
+                              },
+                              leading: CircleAvatar(
+                                foregroundImage:
+                                    NetworkImage(usersInfo.photoUrl ?? ''),
+                              ),
+                              title: Text(usersInfo.name),
+                              subtitle: Text(lastMessage),
+                              trailing: Text(time),
+                            );
                           },
-                          leading: CircleAvatar(
-                            foregroundImage:
-                                NetworkImage(usersInfo.photoUrl ?? ''),
-                          ),
-                          title: Text(usersInfo.name),
                         );
                       },
                     );

@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:chat_app/model/user_model.dart';
 import 'package:chat_app/services/firestore_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import '../services/fcm_service.dart';
 import '../services/firebase_services.dart';
 
 class RegisterController extends GetxController {
@@ -36,7 +36,7 @@ class RegisterController extends GetxController {
           name: name,
           photoUrl: image,
           uid: FirebaseAuth.instance.currentUser!.uid,
-          token: await FcmService.instance.getAccessToken() ?? '');
+          token: await FirebaseMessaging.instance.getToken() ?? '');
       FireStoreService.instance.addUser(user: userModel);
       Get.snackbar(
         'Success',

@@ -4,69 +4,81 @@ import 'package:flutter/services.dart';
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:http/http.dart' as http;
 
-class FcmService {
-  FcmService._();
-  static FcmService instance = FcmService._();
+class FCMService {
+  FCMService._();
+  static FCMService instance = FCMService._();
 
-  //get user Access Token
-  Future<String> getAccessToken() async {
-    String jsonPath = "assets/json/fcm.json";
+  Future<String?> getAccessToken() async {
+    try {
+      String jsonString = await rootBundle.loadString('assets/json/fcm.json');
+      var jsonDecoded = jsonDecode(jsonString);
+      jsonDecoded['private_key'] =
+          (jsonDecoded['private_key'] as String).replaceAll(r'\n', '\n');
+      var accountCredential =
+          ServiceAccountCredentials.fromJson(jsonEncode(jsonDecoded));
 
-    String json = await rootBundle.loadString(jsonPath);
+      List<String> scopes = [
+        "https://www.googleapis.com/auth/firebase.messaging"
+      ];
 
-    var accountCredential = ServiceAccountCredentials.fromJson(json);
-
-    List<String> scopes = [
-      "https://www.googleapis.com/auth/firebase.messaging"
-    ];
-    var accessToken = await clientViaServiceAccount(accountCredential, scopes);
-    return accessToken.credentials.accessToken.data;
+      var accessToken =
+          await clientViaServiceAccount(accountCredential, scopes);
+      return accessToken.credentials.accessToken.data;
+    } catch (e, stacktrace) {
+      log("⚠️ Error in getAccessToken: $e");
+      log("🔍 StackTrace: $stacktrace");
+      return null;
+    }
   }
 
-  // send notification
-  Future<void> sendNotification({
+  /// Send FCM Notification
+  Future<void> sendFCM({
     required String title,
     required String body,
-    required String accessToken,
+    required String token,
   }) async {
-    String token = await getAccessToken();
+    try {
+      String? accessToken = await getAccessToken();
+      if (accessToken == null) {
+        log("❌ Failed to get access token.");
+        return;
+      }
 
-    String api =
-        "https://fcm.googleapis.com/v1/projects/chat-app-ed4b3/messages:send";
+      String apiUrl =
+          "https://fcm.googleapis.com/v1/projects/chat-app-ed4b3/messages:send";
 
-    Map<String, dynamic> myBody = {
-      'message': {
-        'token': accessToken,
-        'notification': {
-          'title': title,
-          'body': body,
+      Map<String, dynamic> apiBody = {
+        'message': {
+          'token': token,
+          'notification': {
+            'title': title,
+            'body': body,
+          },
+          'data': {
+            'age': '22',
+            'school': 'PQR',
+          }
         },
-        'data': {
-          'age': '22',
-          'school': 'PQR',
-        }
-      },
-    };
+      };
 
-    http.Response res = await http.post(
-      Uri.parse(api),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: jsonEncode(myBody),
-    );
+      http.Response res = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $accessToken',
+        },
+        body: jsonEncode(apiBody),
+      );
 
-    log("Status Code : ${res.statusCode}");
-    if (res.statusCode == 200) {
-      log("-------------------------------");
-      log("Notification Send Successfully.....");
-      log("Data : ${res.body}.....");
-      log("-------------------------------");
-    } else {
-      log("-------------------------------");
-      log("Error : ${res.body}");
-      log("-------------------------------");
+      if (res.statusCode == 200) {
+        log('✅ Notification sent successfully: ${res.body}');
+      } else {
+        log('❌ Failed to send notification. Status Code: ${res.statusCode}');
+        log('Response: ${res.body}');
+      }
+    } catch (e, stacktrace) {
+      log("⚠️ Error in sendFCM: $e");
+      log("🔍 StackTrace: $stacktrace");
     }
   }
 }
